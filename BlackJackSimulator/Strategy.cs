@@ -31,7 +31,7 @@ namespace BlackJackSimulator
             string handval = hand.GetValue().ToString();
             string dealerval = dealerUpCard.GetValue().ToString();
             
-            return StrategySteps.Single(
+            return StrategySteps.First(
                 x => x.Key.PlayerHandValue == handval
                 && x.Key.DealerUpCardValue == dealerval).Value;
         }

@@ -8,11 +8,46 @@ namespace BlackJackSimulator
         static void Main(string[] args)
         {
 
+
+            int numTasks;
+            int numGames;
+            int numPlayers;
+            string hardPath = "hard.csv";
+            string softPath = "soft.csv";
+            string pairPath = "pair.csv";
+
+            if (args.Length == 6)
+            {
+                numTasks = int.Parse(args[0]);
+                numGames = int.Parse(args[1]);
+                numPlayers = int.Parse(args[2]);
+                hardPath = args[3];
+                softPath = args[4];
+                pairPath = args[5];
+            }
+            else
+            {
+                Console.Write("Enter the number of tasks (tables): ");
+                numTasks = int.Parse(Console.ReadLine());
+                Console.Write("Enter the number of games / table: ");
+                numGames = int.Parse(Console.ReadLine());
+                Console.Write("Enter the number of players: ");
+                numPlayers = int.Parse(Console.ReadLine());
+                Console.Write("Enter the path of the hard total csv: ");
+                hardPath = Console.ReadLine();
+                Console.Write("Enter the path of the soft total csv: ");
+                softPath = Console.ReadLine();
+                Console.Write("Enter the path of the pair csv: ");
+                pairPath = Console.ReadLine();
+            }
+
+
+
             #region strategy
 
             //forrás: https://www.blackjackinfo.com/blackjack-basic-strategy-engine/?numdecks=6&soft17=s17&dbl=all&das=yes&surr=ns&peek=no
 
-            StreamReader sr = new StreamReader("hard.csv");
+            StreamReader sr = new StreamReader(hardPath);
             string[] lines = sr.ReadToEnd().Split("\r\n");
             sr.Close();
 
@@ -55,7 +90,7 @@ namespace BlackJackSimulator
                 }
             }
 
-            sr = new StreamReader("soft.csv");
+            sr = new StreamReader(softPath);
             lines = sr.ReadToEnd().Split("\r\n");
             sr.Close();
             for (int i = 1; i < 9; i++)
@@ -93,7 +128,7 @@ namespace BlackJackSimulator
                 }
             }
 
-            sr = new StreamReader("pair.csv");
+            sr = new StreamReader(pairPath);
             lines = sr.ReadToEnd().Split("\r\n");
             sr.Close();
             for (int i = 1; i < 11; i++)
@@ -133,25 +168,6 @@ namespace BlackJackSimulator
 
             #endregion
 
-            int numTasks;
-            int numGames;
-            int numPlayers;
-
-            if (args.Length == 3)
-            {
-                numTasks = int.Parse(args[0]);
-                numGames = int.Parse(args[1]);
-                numPlayers = int.Parse(args[2]);
-            }
-            else
-            {
-                Console.Write("Enter the number of tasks (tables): ");
-                numTasks = int.Parse(Console.ReadLine());
-                Console.Write("Enter the number of games / table: ");
-                numGames = int.Parse(Console.ReadLine());
-                Console.Write("Enter the number of players: ");
-                numPlayers = int.Parse(Console.ReadLine());
-            }
 
             double score = 0;
             object lockObj = new object();
