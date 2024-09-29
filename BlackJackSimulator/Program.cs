@@ -135,11 +135,13 @@ namespace BlackJackSimulator
 
             int numTasks;
             int numGames;
+            int numPlayers;
 
-            if (args.Length == 2)
+            if (args.Length == 3)
             {
                 numTasks = int.Parse(args[0]);
                 numGames = int.Parse(args[1]);
+                numPlayers = int.Parse(args[2]);
             }
             else
             {
@@ -147,6 +149,8 @@ namespace BlackJackSimulator
                 numTasks = int.Parse(Console.ReadLine());
                 Console.Write("Enter the number of games / table: ");
                 numGames = int.Parse(Console.ReadLine());
+                Console.Write("Enter the number of players: ");
+                numPlayers = int.Parse(Console.ReadLine());
             }
 
             double score = 0;
@@ -160,7 +164,7 @@ namespace BlackJackSimulator
             {
                 tasks.Add(new Task(() =>
                 {
-                    Game g = new Game(Game.DefaultNumberOfPlayers, Game.DefaultNumberOfDecks, Strategy);
+                    Game g = new Game(numPlayers, Game.DefaultNumberOfDecks, Strategy);
 
                     for (int j = 0; j < numGames; j++)
                     {
@@ -199,10 +203,13 @@ namespace BlackJackSimulator
             Console.WriteLine("---");
             Console.WriteLine("Total tables: " + numTasks);
             Console.WriteLine("Games / table: " + numGames);
-            long totalgames = numTasks * numGames;
+            long totalgames = (long)numTasks * numGames;
             Console.WriteLine("Total number of games: " + totalgames);
+            Console.WriteLine("Number of players: " + numPlayers);
+            long totalhands = totalgames * numPlayers;
+            Console.WriteLine("Total number of hands: " + totalhands);
             Console.WriteLine("Total earnings overall: " + score + " units");
-            Console.WriteLine("Earnings / game: " + (double)score / totalgames + " units/game");
+            Console.WriteLine("Earnings / hand: " + (double)score / totalhands + " units/hand");
             Console.WriteLine("Runtime: " + sw.Elapsed + " (" + sw.Elapsed.TotalMinutes + " minutes)");
             int errorCount = tasks.Count(x => x.IsFaulted);
             if (errorCount > 0)
