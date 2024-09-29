@@ -20,5 +20,10 @@ namespace BlackJackSimulator
             return HandValue.GetValue(this);
         }
 
+        public override string ToString()
+        {
+            return this.GetValue().ToString();
+        }
+
     }
 }

@@ -60,6 +60,31 @@ namespace BlackJackSimulator
             return new HandValue(value, isSoft);
         }
 
+        /// <summary>
+        /// Gets the value of a card
+        /// </summary>
+        /// <param name="card"></param>
+        internal static int GetValue(Card card)
+        {
+            if (card == Card.Jack || card == Card.Queen || card == Card.King)
+            {
+                return 10;
+            }
+            else if (card == Card.Ace)
+            {
+                return 11;
+            }
+            else
+            {
+                return (int)card;
+            }
+        }
+
+        public override string ToString()
+        {
+            return IsBlackJack ? "BJ" : IsSoft ? $"S{Value}" : Value.ToString();
+        }
+
         public static bool operator <(HandValue left, HandValue right)
         {
             return left.Value < right.Value || (!left.IsBlackJack && right.IsBlackJack);

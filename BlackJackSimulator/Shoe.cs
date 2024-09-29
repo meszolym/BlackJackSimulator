@@ -22,6 +22,15 @@ namespace BlackJackSimulator
         Queen = 12,
         King = 13
     }
+    internal static class CardExtension
+    {
+        public static int GetValue(this Card card)
+        {
+            return HandValue.GetValue(card);
+        }
+    }
+
+
     internal class Shoe
     {
         Dictionary<Card, int> Cards = new();
