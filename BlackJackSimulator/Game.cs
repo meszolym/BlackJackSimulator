@@ -15,16 +15,16 @@ namespace BlackJackSimulator
         public const int DefaultNumberOfDecks = 6;
 
         Dealer dealer;
-        Player[] players;
+        internal Player[] players;
         Shoe shoe;
 
-        public Game(int numberOfPlayers, int numberOfDecks, Strategy playerStrategy)
+        public Game(int numberOfPlayers, int numberOfDecks)
         {
             dealer = new Dealer();
             players = new Player[numberOfPlayers];
             for (int i = 0; i < numberOfPlayers; i++)
             {
-                players[i] = new Player(playerStrategy);
+                players[i] = new Player();
             }
             shoe = new Shoe(numberOfDecks);
         }
@@ -171,35 +171,28 @@ namespace BlackJackSimulator
             }
         }
 
+        internal struct PossibleActions
+        {
+            internal bool canHit;
+            internal bool canStand;
+            internal bool canDouble;
+            internal bool canSplit;
+
+        }
+
         /// <summary>
         /// Gets the possible actions on a hand
         /// </summary>
         /// <param name="hand"></param>
         /// <returns></returns>
-        public static Dictionary<Action, bool> GetPossibleActions(Hand hand)
+        internal static PossibleActions GetPossibleActions(Hand hand)
         {
-            var possibleActions = new Dictionary<Action, bool>();
-            foreach (var action in Enum.GetValues(typeof(Action)))
-            {
-                //initialize all actions to false
-                possibleActions.Add((Action)action, false);
-            }
-            possibleActions[Action.Stand] = true;
+            var possibleActions = new PossibleActions();
+            possibleActions.canStand = true;
 
-            if (hand.GetValue().Value > 21)
+            if (hand.GetValue().Value >= 21)
             {
-                //busted hands can only stand
-                return possibleActions;
-            }
-
-            //check for blackjack or 21
-            if (hand.GetValue().Value == 21)
-            {
-                //no actions can be taken on blackjack
-                possibleActions[Action.Hit] = false;
-                possibleActions[Action.DoubleHit] = false;
-                possibleActions[Action.DoubleStand] = false;
-                possibleActions[Action.Split] = false;
+                //busted hands & 21 can only stand
                 return possibleActions;
             }
 
@@ -209,28 +202,26 @@ namespace BlackJackSimulator
                 if (hand.Cards[0] == Card.Ace && hand.IsSplit)
                 {
                     //no actions can be taken on split aces
-                    possibleActions[Action.Hit] = false;
-                    possibleActions[Action.DoubleStand] = false;
-                    possibleActions[Action.DoubleHit] = false;
-                    possibleActions[Action.Split] = false;
+                    possibleActions.canHit = false;
+                    possibleActions.canDouble = false;
+                    possibleActions.canSplit = false;
                     return possibleActions;
                 }
 
                 //double/hit any 2 cards
-                possibleActions[Action.Hit] = true;
-                possibleActions[Action.DoubleStand] = true;
-                possibleActions[Action.DoubleHit] = true;
+                possibleActions.canHit = true;
+                possibleActions.canDouble = true; 
 
                 if (hand.Cards[0] == hand.Cards[1] && !hand.IsSplit)
                 {
                     //split any identical pair, if not already split
-                    possibleActions[Action.Split] = true;
+                    possibleActions.canSplit = true;
                 }
                 return possibleActions;
             }
 
             //if the hand has more than 2 cards, only hit and stand are possible
-            possibleActions[Action.Hit] = true;
+            possibleActions.canHit = true;
             return possibleActions;
 
         }

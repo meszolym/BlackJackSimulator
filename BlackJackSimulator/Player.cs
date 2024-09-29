@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static BlackJackSimulator.Game;
 
 namespace BlackJackSimulator
 {
@@ -23,14 +24,11 @@ namespace BlackJackSimulator
             }
         }
 
-        Strategy strategy;
-
-        public Player(Strategy strategy)
+        public Player()
         {
             Hands = new Hand[2];
             Hands[0] = new Hand();
             Hands[1] = new Hand();
-            this.strategy = strategy;
         }
 
         internal override void ClearHand()
@@ -42,9 +40,13 @@ namespace BlackJackSimulator
         internal override void PlayHands(Game game)
         {
             var possibleActions = Game.GetPossibleActions(Hands[0]);
-            var actionToTake = strategy.GetAction(Hands[0], game.DealerUpCard);
+            Action? actionToTake = null;
+            if (possibleActions.canHit || possibleActions.canDouble || possibleActions.canSplit)
+            {
+                actionToTake = Strategy.GetAction(Hands[0], game.DealerUpCard, possibleActions.canSplit);
+            }
 
-            if (actionToTake == Action.Split && possibleActions[Action.Split])
+            if (actionToTake == Action.Split && possibleActions.canSplit)
             {
                 //split the hand into two
                 var Card = Hands[0].Cards[1];
@@ -70,54 +72,44 @@ namespace BlackJackSimulator
 
         internal void PlayOneHand(Hand hand, Game game)
         {
-            var possibleActions = Game.GetPossibleActions(hand);
-            var actionToTake = strategy.GetAction(hand, game.DealerUpCard);
-
-            /*
-                Hit,
-                Stand,
-                DoubleHit,
-                DoubleStand,
-                Split
-             */
-
-            //while player can do anything besides standing, and it is not time to stand
-            while (possibleActions.Any(x => x.Value == true && x.Key != Action.Stand) 
-                && actionToTake != Action.Stand)
+            PossibleActions possibleActions;
+            Action? actionToTake = null;
+            do
             {
-                if (actionToTake == Action.Hit && possibleActions[Action.Hit])
+                possibleActions = Game.GetPossibleActions(hand);
+                if (possibleActions.canHit || possibleActions.canDouble || possibleActions.canSplit)
+                {
+                    actionToTake = Strategy.GetAction(hand, game.DealerUpCard);
+                }
+
+                if (actionToTake == Action.Hit && possibleActions.canHit)
                 {
                     game.Hit(hand);
-                    possibleActions = Game.GetPossibleActions(hand);
-                    actionToTake = strategy.GetAction(hand, game.DealerUpCard);
                     continue;
                 }
-                
+
                 if (actionToTake == Action.DoubleHit)
                 {
-                    //if can double, do, otherwise hit;
-                    if (possibleActions[Action.DoubleHit])
+                    if (possibleActions.canDouble)
                     {
                         hand.Bet *= 2;
                     }
                     game.Hit(hand);
-                    break;
+                    continue;
                 }
 
                 if (actionToTake == Action.DoubleStand)
                 {
-                    //if can double, do, otherwise stand
-                    if (possibleActions[Action.DoubleStand])
+                    if (possibleActions.canDouble)
                     {
                         hand.Bet *= 2;
-                        game.Hit(hand);
                     }
                     break;
                 }
 
-                throw new Exception("Should never get here");
+            } while (hand.GetValue().Value < 21 && actionToTake != null && actionToTake != Action.Stand);
 
-            }
+            
 
 
         }

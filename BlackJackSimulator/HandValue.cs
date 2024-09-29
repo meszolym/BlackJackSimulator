@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,19 +11,15 @@ namespace BlackJackSimulator
     {
         internal readonly int Value;
         internal readonly bool IsSoft;
-        internal bool IsBlackJack
-        {
-            get
-            {
-                //if the value of the hand is 21 and it's soft, it's a blackjack
-                return Value == 21 && IsSoft;
-            }
-        }
+        internal bool IsBlackJack;
+        internal bool IsPair;
 
-        internal HandValue(int value, bool isSoft)
+        internal HandValue(int value, bool isSoft, bool isBlackJack, bool isPair)
         {
             Value = value;
             IsSoft = isSoft;
+            IsBlackJack = isBlackJack;
+            IsPair = isPair;
         }
 
         /// <summary>
@@ -34,6 +31,8 @@ namespace BlackJackSimulator
         {
             int value = 0;
             bool isSoft = false;
+            bool isBlackJack = false;
+            bool isPair = false;
 
             foreach (var card in hand.Cards)
             {
@@ -57,7 +56,19 @@ namespace BlackJackSimulator
                 value += 10;
                 isSoft = true;
             }
-            return new HandValue(value, isSoft);
+
+            if (hand.Cards.Count == 2 && value == 21)
+            {
+                isBlackJack = true;
+                isSoft = false;
+            }
+
+            if (hand.Cards.Count == 2 && hand.Cards[0] == hand.Cards[1] && !hand.IsSplit)
+            {
+                isPair = true;
+            }
+
+            return new HandValue(value, isSoft, isBlackJack, isPair);
         }
 
         /// <summary>
@@ -82,7 +93,23 @@ namespace BlackJackSimulator
 
         public override string ToString()
         {
-            return IsBlackJack ? "BJ" : IsSoft ? $"S{Value}" : Value.ToString();
+            if (IsBlackJack)
+            {
+                return "BJ";
+            }
+            if (IsSoft && IsPair)
+            {
+                return "P11"; //Pair of Aces
+            }
+            if (IsSoft)
+            {
+                return $"S{Value}";
+            }
+            if (IsPair)
+            {
+                return $"P{Value/2}";
+            }
+            return Value.ToString();
         }
 
         public static bool operator <(HandValue left, HandValue right)
