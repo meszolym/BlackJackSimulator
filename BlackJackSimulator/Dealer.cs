@@ -17,9 +17,12 @@ namespace BlackJackSimulator
             Hands[0] = new Hand();
         }
 
-        internal override void PlayHands(Card? dealerUpCard = null)
+        internal override void PlayHands(Game game)
         {
-            throw new NotImplementedException();
+            while (Hand.GetValue().Value < 17)
+            {
+                game.Hit(Hand);
+            }
         }
     }
 }

@@ -16,6 +16,14 @@ namespace BlackJackSimulator
     }
     internal class Strategy
     {
-        
+        internal Action GetAction(Hand hand, Card dealerUpCard)
+        {
+            //mimic the dealer
+            if (hand.GetValue().Value < 17)
+            {
+                return Action.Hit;
+            }
+            return Action.Stand;
+        }
     }
 }

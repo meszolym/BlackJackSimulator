@@ -9,7 +9,7 @@ namespace BlackJackSimulator
     internal abstract class Agent
     {
         internal abstract Hand[] Hands { get; set; }
-        internal abstract void PlayHands(Card? dealerUpCard);
+        internal abstract void PlayHands(Game game);
         internal virtual void ClearHand()
         {
             foreach (var hand in Hands)

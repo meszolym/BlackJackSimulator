@@ -14,31 +14,32 @@ namespace BlackJackSimulator
         public const int DefaultNumberOfPlayers = 1;
         public const int DefaultNumberOfDecks = 6;
 
-        internal struct PossibleActions
-        {
-            internal bool CanHit;
-            internal bool CanStand;
-            internal bool CanDouble;
-            internal bool CanSplit;
-        }
-
         Dealer dealer;
         Player[] players;
         Shoe shoe;
 
-        
-
-        public Game(int numberOfPlayers, int numberOfDecks)
+        public Game(int numberOfPlayers, int numberOfDecks, Strategy playerStrategy)
         {
             dealer = new Dealer();
             players = new Player[numberOfPlayers];
             for (int i = 0; i < numberOfPlayers; i++)
             {
-                players[i] = new Player();
+                players[i] = new Player(playerStrategy);
             }
             shoe = new Shoe(numberOfDecks);
         }
 
+        internal Card DealerUpCard
+        {
+            get
+            {
+                if (dealer.Hand.Cards.Count == 0)
+                {
+                    throw new AccessViolationException("Dealer has no upcard at this time!");
+                }
+                return dealer.Hand.Cards[0];
+            }
+        }
         public void PlayRound()
         {
             clearTable();
@@ -55,7 +56,7 @@ namespace BlackJackSimulator
             //play each player's hand
             foreach (var p in players)
             {
-                p.PlayHands(dealer.Hand.Cards[0]);
+                p.PlayHands(this);
                 foreach (var hand in p.Hands.Where(h => h.InPlay))
                 {
                     if (hand.GetValue().Value > 21)
@@ -74,7 +75,7 @@ namespace BlackJackSimulator
             }
 
             //play dealer's hand
-            dealer.PlayHands();
+            dealer.PlayHands(this);
 
             //check for dealer bust
             if (dealer.Hand.GetValue().Value > 21)
@@ -101,6 +102,11 @@ namespace BlackJackSimulator
                     if (playerValue > dealerValue)
                     {
                         player.Balance += hand.Bet;
+                        if (playerValue.IsBlackJack)
+                        {
+                            //player has blackjack, pay 3:2
+                            player.Balance += hand.Bet * 0.5;
+                        }
                     }
                     else if (playerValue < dealerValue)
                     {
@@ -146,7 +152,7 @@ namespace BlackJackSimulator
             {
                 foreach (var player in players)
                 {
-                    Hit(player.Hands[i]);
+                    Hit(player.Hands[0]);
                 }
                 Hit(dealer.Hand);
             }
@@ -170,19 +176,31 @@ namespace BlackJackSimulator
         /// </summary>
         /// <param name="hand"></param>
         /// <returns></returns>
-        public static PossibleActions GetPossibleActions(Hand hand)
+        public static Dictionary<Action, bool> GetPossibleActions(Hand hand)
         {
-            var p = new PossibleActions();
-            p.CanStand = true; //always an option
+            var possibleActions = new Dictionary<Action, bool>();
+            foreach (var action in Enum.GetValues(typeof(Action)))
+            {
+                //initialize all actions to false
+                possibleActions.Add((Action)action, false);
+            }
+            possibleActions[Action.Stand] = true;
+
+            if (hand.GetValue().Value > 21)
+            {
+                //busted hands can only stand
+                return possibleActions;
+            }
 
             //check for blackjack or 21
             if (hand.GetValue().Value == 21)
             {
                 //no actions can be taken on blackjack
-                p.CanHit = false;
-                p.CanDouble = false;
-                p.CanSplit = false;
-                return p;
+                possibleActions[Action.Hit] = false;
+                possibleActions[Action.DoubleHit] = false;
+                possibleActions[Action.DoubleStand] = false;
+                possibleActions[Action.Split] = false;
+                return possibleActions;
             }
 
             if (hand.Cards.Count == 2)
@@ -191,27 +209,29 @@ namespace BlackJackSimulator
                 if (hand.Cards[0] == Card.Ace && hand.IsSplit)
                 {
                     //no actions can be taken on split aces
-                    p.CanHit = false;
-                    p.CanDouble = false;
-                    p.CanSplit = false;
-                    return p;
+                    possibleActions[Action.Hit] = false;
+                    possibleActions[Action.DoubleStand] = false;
+                    possibleActions[Action.DoubleHit] = false;
+                    possibleActions[Action.Split] = false;
+                    return possibleActions;
                 }
 
                 //double/hit any 2 cards
-                p.CanDouble = true;
-                p.CanHit = true;
+                possibleActions[Action.Hit] = true;
+                possibleActions[Action.DoubleStand] = true;
+                possibleActions[Action.DoubleHit] = true;
 
                 if (hand.Cards[0] == hand.Cards[1] && !hand.IsSplit)
                 {
                     //split any identical pair, if not already split
-                    p.CanSplit = true; 
+                    possibleActions[Action.Split] = true;
                 }
-                return p;
+                return possibleActions;
             }
 
             //if the hand has more than 2 cards, only hit and stand are possible
-            p.CanHit = true;
-            return p;
+            possibleActions[Action.Hit] = true;
+            return possibleActions;
 
         }
 
