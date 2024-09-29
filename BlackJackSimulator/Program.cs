@@ -16,6 +16,8 @@ namespace BlackJackSimulator
             string[] lines = sr.ReadToEnd().Split("\r\n");
             sr.Close();
 
+            Strategy Strategy = new Strategy();
+
             string val = "";
             Action? act = null;
             for (int i = 1; i < 19; i++)
@@ -158,23 +160,26 @@ namespace BlackJackSimulator
             {
                 tasks.Add(new Task(() =>
                 {
-                    Game g = new Game(Game.DefaultNumberOfPlayers, Game.DefaultNumberOfDecks);
+                    Game g = new Game(Game.DefaultNumberOfPlayers, Game.DefaultNumberOfDecks, Strategy);
 
                     for (int j = 0; j < numGames; j++)
                     {
                         g.PlayRound();
                     }
 
+                    double localScore = 0;
+                    
+                    foreach (var p in g.players)
+                    {
+                        localScore += p.Balance;
+                    }
                     lock (lockObj)
                     {
-                        foreach (var p in g.players)
-                        {
-                            score += p.Balance;
-                        }
                         comp++;
-                        pct = Math.Round((double)comp / numTasks * 100, 2);
-                        Console.WriteLine("Performed tasks: " + comp + " out of " + numTasks + " (" + pct + "%) in " + sw.Elapsed);
+                        score += localScore;
+                        Console.WriteLine("Performed tasks: " + comp + " out of " + numTasks + " in " + sw.Elapsed);
                     }
+
                 }));
             }
 
@@ -209,7 +214,6 @@ namespace BlackJackSimulator
                 {
                     Console.WriteLine(task.Exception);
                 }*/
-
 
             }
 

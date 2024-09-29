@@ -21,22 +21,19 @@ namespace BlackJackSimulator
         internal string DealerUpCardValue;
     }
 
-    internal static class Strategy
+    internal class Strategy
     {
 
-        internal static Dictionary<ActionKey, Action> StrategySteps = new();
+        internal Dictionary<ActionKey, Action> StrategySteps = new();
 
-        internal static Action GetAction(Hand hand, Card dealerUpCard, bool canSplit = false)
+        internal Action GetAction(Hand hand, Card dealerUpCard, bool canSplit = false)
         {
             string handval = hand.GetValue().ToString();
             string dealerval = dealerUpCard.GetValue().ToString();
             
-            Action a = StrategySteps.Single(
+            return StrategySteps.Single(
                 x => x.Key.PlayerHandValue == handval
                 && x.Key.DealerUpCardValue == dealerval).Value;
-
-            
-            return a;
         }
 
     }

@@ -18,13 +18,13 @@ namespace BlackJackSimulator
         internal Player[] players;
         Shoe shoe;
 
-        public Game(int numberOfPlayers, int numberOfDecks)
+        public Game(int numberOfPlayers, int numberOfDecks, Strategy strategy)
         {
             dealer = new Dealer();
             players = new Player[numberOfPlayers];
             for (int i = 0; i < numberOfPlayers; i++)
             {
-                players[i] = new Player();
+                players[i] = new Player(strategy);
             }
             shoe = new Shoe(numberOfDecks);
         }

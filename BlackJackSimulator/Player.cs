@@ -24,11 +24,13 @@ namespace BlackJackSimulator
             }
         }
 
-        public Player()
+        Strategy Strategy;
+        public Player(Strategy strategy)
         {
             Hands = new Hand[2];
             Hands[0] = new Hand();
             Hands[1] = new Hand();
+            Strategy = strategy;
         }
 
         internal override void ClearHand()
