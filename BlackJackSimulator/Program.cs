@@ -16,14 +16,17 @@ namespace BlackJackSimulator
             string softPath = "soft.csv";
             string pairPath = "pair.csv";
 
+            string dir = "";
+
             if (args.Length == 4)
             {
                 numTasks = int.Parse(args[0]);
                 numGames = int.Parse(args[1]);
                 numPlayers = int.Parse(args[2]);
-                hardPath = Path.Combine(args[3],hardPath);
-                softPath = Path.Combine(args[3], softPath);
-                pairPath = Path.Combine(args[3], pairPath);
+                dir = args[3];
+                hardPath = Path.Combine(dir, hardPath);
+                softPath = Path.Combine(dir, softPath);
+                pairPath = Path.Combine(dir, pairPath);
             }
             else
             {
@@ -34,7 +37,7 @@ namespace BlackJackSimulator
                 Console.Write("Enter the number of players: ");
                 numPlayers = int.Parse(Console.ReadLine());
                 Console.Write("Enter the path to the directory containing the strategy csv-s: ");
-                string dir = Console.ReadLine();
+                dir = Console.ReadLine();
                 hardPath = Path.Combine(dir, hardPath);
                 softPath = Path.Combine(dir, softPath);
                 pairPath = Path.Combine(dir, pairPath);
@@ -197,7 +200,10 @@ namespace BlackJackSimulator
                     {
                         comp++;
                         score += localScore;
-                        Console.WriteLine("Performed tasks: " + comp + " out of " + numTasks + " in " + sw.Elapsed);
+                        if (comp % 5 == 0)
+                        {
+                            Console.WriteLine("Performed tasks: " + comp + " out of " + numTasks + " in " + sw.Elapsed);
+                        }
                     }
 
                 }));
@@ -217,6 +223,7 @@ namespace BlackJackSimulator
             { }
             sw.Stop();
             Console.WriteLine("---");
+            Console.WriteLine("Strategy: " + dir);
             Console.WriteLine("Total tables: " + numTasks);
             Console.WriteLine("Games / table: " + numGames);
             long totalgames = (long)numTasks * numGames;
