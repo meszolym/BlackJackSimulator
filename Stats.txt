@@ -1,0 +1,120 @@
+Stats:
+
+NO PEEK -> -0.67%
+
+https://www.blackjackinfo.com/blackjack-basic-strategy-engine/?numdecks=6&soft17=s17&dbl=all&das=yes&surr=ns&peek=no
+
+Total tables: 10000
+Games / table: 100000
+Total number of games: 1000000000
+Total earnings overall: -6713892 units
+Earnings / game: -0.006713892 units/game -> -0.67%
+Runtime: 00:19:24.7532662 (19.412554436666667 minutes)
+
+Total tables: 10000
+Games / table: 100000
+Total number of games: 1000000000
+Total earnings overall: -6775601.5 units
+Earnings / game: -0.0067756015 units/game -> -0.68%
+Runtime: 00:50:55.2221499 (50.920369165 minutes) <- szerveren futott
+
+Új, 1db random / futtatás:
+
+Total tables: 10000
+Games / table: 100000
+Total number of games: 1000000000
+Number of players: 1
+Total number of hands: 1000000000
+Total earnings overall: -6733013 units
+Earnings / hand: -0.006733013 units/hand -> -0.67%
+Runtime: 00:35:47.9788205 (35.79964700833333 minutes) <- 4 sim futott egyszerre
+
+Total tables: 10000
+Games / table: 100000
+Total number of games: 1000000000
+Number of players: 1
+Total number of hands: 1000000000
+Total earnings overall: -6704892 units
+Earnings / hand: -0.006704892 units/hand -> -0.67%
+Runtime: 00:35:56.0646334 (35.93441055666667 minutes) <- 4 sim futott egyszerre
+
+--
+
+PEEK
+
+https://www.blackjackinfo.com/blackjack-basic-strategy-engine/?numdecks=6&soft17=s17&dbl=all&das=yes&surr=ns&peek=yes
+
+Total tables: 10000
+Games / table: 100000
+Total number of games: 1000000000
+Number of players: 1
+Total number of hands: 1000000000
+Total earnings overall: -6155431 units
+Earnings / hand: -0.006155431 units/hand -> -0.62%
+Runtime: 00:19:51.5400219 (19.859000365 minutes)
+
+Total tables: 10000
+Games / table: 100000
+Total number of games: 1000000000
+Number of players: 1
+Total number of hands: 1000000000
+Total earnings overall: -6172051 units 
+Earnings / hand: -0.006172051 units/hand -> -0.62%
+Runtime: 00:18:36.5950545 (18.609917575 minutes)
+
+Új, 1db random / futtatás:
+
+Total tables: 10000
+Games / table: 100000
+Total number of games: 1000000000
+Number of players: 1
+Total number of hands: 1000000000
+Total earnings overall: -6171042.5 units 
+Earnings / hand: -0.0061710425 units/hand -> -0.62%
+Runtime: 00:35:11.8823722 (35.19803953666667 minutes) <- 4 sim futott egyszerre
+
+Total tables: 10000
+Games / table: 100000
+Total number of games: 1000000000
+Number of players: 1
+Total number of hands: 1000000000
+Total earnings overall: -6189400 units
+Earnings / hand: -0.0061894 units/hand -> -0.62%
+Runtime: 00:36:13.1029618 (36.218382696666666 minutes) <- 4 sim futott egyszerre
+
+--
+
+https://www.blackjackinfo.com/blackjack-basic-strategy-engine/?numdecks=6&soft17=s17&dbl=all&das=yes&surr=ns&peek=yes , de a osztói 10-es oszlopot kicseréltem  no-peek verzióra.
+
+Total tables: 10000
+Games / table: 100000
+Total number of games: 1000000000
+Number of players: 1
+Total number of hands: 1000000000
+Total earnings overall: -6630591 units
+Earnings / hand: -0.006630591 units/hand -> -0.66%
+Runtime: 00:08:48.3551678 (8.805919463333334 minutes)
+
+Total tables: 10000
+Games / table: 100000
+Total number of games: 1000000000
+Number of players: 1
+Total number of hands: 1000000000
+Total earnings overall: -6593405 units
+Earnings / hand: -0.006593405 units/hand -> -0.66%
+Runtime: 00:08:58.8544549 (8.980907581666667 minutes)
+
+--
+
+https://www.blackjackinfo.com/blackjack-basic-strategy-engine/?numdecks=6&soft17=s17&dbl=all&das=yes&surr=ns&peek=yes, de a 10-esek osztását az osztói 10 ellen bekapcsoltam
+
+Total tables: 10000
+Games / table: 100000
+Total number of games: 1000000000
+Number of players: 1
+Total number of hands: 1000000000
+Total earnings overall: -9488890 units
+Earnings / hand: -0.00948889 units/hand -> -0.95%
+Runtime: 00:09:40.6616150 (9.677693583333333 minutes)
+
+

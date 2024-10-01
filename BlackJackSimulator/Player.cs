@@ -11,18 +11,7 @@ namespace BlackJackSimulator
     {
 
         internal override Hand[] Hands { get; set; }
-        internal double Balance
-        {
-            get;
-            set;
-        }
-
-        internal bool InPlay { 
-            get
-            {
-                return Hands.Any(h => h.InPlay);
-            }
-        }
+        internal double Balance;
 
         Strategy Strategy;
         public Player(Strategy strategy)
@@ -36,7 +25,7 @@ namespace BlackJackSimulator
         internal override void ClearHand()
         {
             base.ClearHand();
-            Hands[1].InPlay = false;
+            Hands[1].InPlay = false; //split hand not in play yet
         }
 
         internal override void PlayHands(Game game)
@@ -45,7 +34,7 @@ namespace BlackJackSimulator
             Action? actionToTake = null;
             if (possibleActions.canHit || possibleActions.canDouble || possibleActions.canSplit)
             {
-                actionToTake = Strategy.GetAction(Hands[0], game.DealerUpCard, possibleActions.canSplit);
+                actionToTake = Strategy.GetAction(Hands[0], game.DealerUpCard);
             }
 
             if (actionToTake == Action.Split && possibleActions.canSplit)
@@ -92,11 +81,12 @@ namespace BlackJackSimulator
 
                 if (actionToTake == Action.DoubleHit)
                 {
+                    game.Hit(hand);
                     if (possibleActions.canDouble)
                     {
                         hand.Bet *= 2;
+                        return;
                     }
-                    game.Hit(hand);
                     continue;
                 }
 
@@ -104,9 +94,10 @@ namespace BlackJackSimulator
                 {
                     if (possibleActions.canDouble)
                     {
+                        game.Hit(hand);
                         hand.Bet *= 2;
                     }
-                    break;
+                    return;
                 }
 
             } while (hand.GetValue().Value < 21 && actionToTake != null && actionToTake != Action.Stand);

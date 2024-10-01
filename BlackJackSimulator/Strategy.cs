@@ -26,7 +26,7 @@ namespace BlackJackSimulator
 
         internal Dictionary<ActionKey, Action> StrategySteps = new();
 
-        internal Action GetAction(Hand hand, Card dealerUpCard, bool canSplit = false)
+        internal Action GetAction(Hand hand, Card dealerUpCard)
         {
             string handval = hand.GetValue().ToString();
             string dealerval = dealerUpCard.GetValue().ToString();

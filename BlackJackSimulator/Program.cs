@@ -16,14 +16,14 @@ namespace BlackJackSimulator
             string softPath = "soft.csv";
             string pairPath = "pair.csv";
 
-            if (args.Length == 6)
+            if (args.Length == 4)
             {
                 numTasks = int.Parse(args[0]);
                 numGames = int.Parse(args[1]);
                 numPlayers = int.Parse(args[2]);
-                hardPath = args[3];
-                softPath = args[4];
-                pairPath = args[5];
+                hardPath = Path.Combine(args[3],hardPath);
+                softPath = Path.Combine(args[3], softPath);
+                pairPath = Path.Combine(args[3], pairPath);
             }
             else
             {
@@ -33,12 +33,11 @@ namespace BlackJackSimulator
                 numGames = int.Parse(Console.ReadLine());
                 Console.Write("Enter the number of players: ");
                 numPlayers = int.Parse(Console.ReadLine());
-                Console.Write("Enter the path of the hard total csv: ");
-                hardPath = Console.ReadLine();
-                Console.Write("Enter the path of the soft total csv: ");
-                softPath = Console.ReadLine();
-                Console.Write("Enter the path of the pair csv: ");
-                pairPath = Console.ReadLine();
+                Console.Write("Enter the path to the directory containing the strategy csv-s: ");
+                string dir = Console.ReadLine();
+                hardPath = Path.Combine(dir, hardPath);
+                softPath = Path.Combine(dir, softPath);
+                pairPath = Path.Combine(dir, pairPath);
             }
 
 
@@ -176,11 +175,12 @@ namespace BlackJackSimulator
             double pct = 0;
             List<Task> tasks = new List<Task>();
             Stopwatch sw = new Stopwatch();
+            Random rand = new Random();
             for (int i = 0; i < numTasks; i++)
             {
                 tasks.Add(new Task(() =>
                 {
-                    Game g = new Game(numPlayers, Game.DefaultNumberOfDecks, Strategy);
+                    Game g = new Game(numPlayers, Game.DefaultNumberOfDecks, Strategy, rand);
 
                     for (int j = 0; j < numGames; j++)
                     {

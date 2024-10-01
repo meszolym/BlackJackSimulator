@@ -18,7 +18,7 @@ namespace BlackJackSimulator
         internal Player[] players;
         Shoe shoe;
 
-        public Game(int numberOfPlayers, int numberOfDecks, Strategy strategy)
+        public Game(int numberOfPlayers, int numberOfDecks, Strategy strategy, Random random)
         {
             dealer = new Dealer();
             players = new Player[numberOfPlayers];
@@ -26,7 +26,7 @@ namespace BlackJackSimulator
             {
                 players[i] = new Player(strategy);
             }
-            shoe = new Shoe(numberOfDecks);
+            shoe = new Shoe(numberOfDecks, random);
         }
 
         internal Card DealerUpCard
@@ -45,7 +45,7 @@ namespace BlackJackSimulator
             clearTable();
             dealHands();
             //peek at dealer's hole card for blackjack if the upcard is an ace
-            if (dealer.Hand.Cards[0] == Card.Ace)
+            if (DealerUpCard == Card.Ace)
             {
                 if (CheckAndHandleDealerBlackJack())
                 {
@@ -174,10 +174,9 @@ namespace BlackJackSimulator
         internal struct PossibleActions
         {
             internal bool canHit;
-            internal bool canStand;
             internal bool canDouble;
             internal bool canSplit;
-
+            //stand is always an option.
         }
 
         /// <summary>
@@ -188,7 +187,6 @@ namespace BlackJackSimulator
         internal static PossibleActions GetPossibleActions(Hand hand)
         {
             var possibleActions = new PossibleActions();
-            possibleActions.canStand = true;
 
             if (hand.GetValue().Value >= 21)
             {
@@ -202,14 +200,10 @@ namespace BlackJackSimulator
                 if (hand.Cards[0] == Card.Ace && hand.IsSplit)
                 {
                     //no actions can be taken on split aces
-                    possibleActions.canHit = false;
-                    possibleActions.canDouble = false;
-                    possibleActions.canSplit = false;
                     return possibleActions;
                 }
 
-                //double/hit any 2 cards
-                possibleActions.canHit = true;
+                //double any 2 cards + DAS allowed
                 possibleActions.canDouble = true; 
 
                 if (hand.Cards[0] == hand.Cards[1] && !hand.IsSplit)
@@ -217,7 +211,6 @@ namespace BlackJackSimulator
                     //split any identical pair, if not already split
                     possibleActions.canSplit = true;
                 }
-                return possibleActions;
             }
 
             //if the hand has more than 2 cards, only hit and stand are possible
