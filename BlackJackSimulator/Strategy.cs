@@ -15,8 +15,8 @@ using System.Reactive.Linq;
 namespace BlackJackSimulator
 {
 
-    public record StrategyCreationError(Option<string> Message, Exception InnerException);
-
+    public record StrategyError(Option<string> Message, Exception InnerException);
+    
     internal class Strategy
     {
         struct ActionKey
@@ -30,7 +30,7 @@ namespace BlackJackSimulator
 
         ImmutableDictionary<ActionKey, Action> StrategySteps;
 
-        internal static Either<StrategyCreationError, Strategy> FromDirectory(DirectoryPath directoryPath)
+        internal static Either<StrategyError, Strategy> FromDirectory(DirectoryPath directoryPath)
         {
             Dictionary<ActionKey, Action> stratDict = new();
 
@@ -42,46 +42,45 @@ namespace BlackJackSimulator
                             {
                                 string[] lines = sr.ReadToEnd().Split("\r\n");
                                 string val = "";
-                                
 
-                                lines.ToObservable()
-                                     .Select((line, lineIdx) => (line.Split(','), lineIdx))
-                                     .Skip(1)
-                                     .Select((vals, colIdx) => (vals.Item1[colIdx], vals.lineIdx, colIdx))
-                                     .Subscribe(val =>
-                                     {
-                                         Action? act = null;
-                                         switch (val.Item1)
-                                         {
-                                             case "H":
-                                                 act = Action.Hit;
-                                                 break;
-                                             case "S":
-                                                 act = Action.Stand;
-                                                 break;
-                                             case "D":
-                                                 act = Action.DoubleHit;
-                                                 break;
-                                             case "DS":
-                                                 act = Action.DoubleStand;
-                                                 break;
-                                             case "P":
-                                                 act = Action.Split;
-                                                 break;
-                                             default:
-                                                 throw new Exception("Should never get here");
-                                         }
+                                for (int i = 1; i < lines.Length; i++)
+                                {
+                                    string[] line = lines[i].Split(",");
+                                    for (int j = 1; j < line.Length; j++)
+                                    {
+                                        Action? act = null;
+                                        switch (line[j])
+                                        {
+                                            case "H":
+                                                act = Action.Hit;
+                                                break;
+                                            case "S":
+                                                act = Action.Stand;
+                                                break;
+                                            case "D":
+                                                act = Action.DoubleHit;
+                                                break;
+                                            case "DS":
+                                                act = Action.DoubleStand;
+                                                break;
+                                            case "P":
+                                                act = Action.Split;
+                                                break;
+                                            default:
+                                                throw new Exception("Should never get here");
+                                        }
 
-                                         stratDict.Add(new ActionKey()
-                                         {
-                                             PlayerHandValue = lines[val.lineIdx].Split(",")[0],
-                                             DealerUpCardValue = lines[0].Split(",")[val.colIdx]
-                                         }, act.Value);
-                                     });
+                                        stratDict.Add(new ActionKey()
+                                        {
+                                            PlayerHandValue = lines[i].Split(",")[0],
+                                            DealerUpCardValue = lines[0].Split(",")[j]
+                                        }, act.Value);
+                                    }
+                                }
                             }
                         });
                         return new Strategy(stratDict);
-                   }).ToEither(ex => new StrategyCreationError(null, ex));
+                   }).ToEither(ex => new StrategyError("Cannot create strategy", ex));
 
             #region strategy
 
@@ -208,14 +207,14 @@ namespace BlackJackSimulator
         }
 
 
-        internal Action GetAction(Hand hand, Card dealerUpCard)
+        internal Option<Action> GetAction(Hand hand, Card dealerUpCard)
         {
-            string handval = hand.GetValue().ToString();
-            string dealerval = dealerUpCard.GetValue().ToString();
+            string handVal = hand.GetValue().ToString();
+            string dealerVal = dealerUpCard.GetValue().ToString();
             
-            return StrategySteps.First(
-                x => x.Key.PlayerHandValue == handval
-                && x.Key.DealerUpCardValue == dealerval).Value;
+            return StrategySteps.FirstOrDefault(
+                x => x.Key.PlayerHandValue == handVal
+                && x.Key.DealerUpCardValue == dealerVal).Value;
         }
 
 

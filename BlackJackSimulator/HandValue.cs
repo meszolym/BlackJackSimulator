@@ -37,13 +37,14 @@ namespace BlackJackSimulator
 
             foreach (var card in hand.Cards)
             {
-                if (card == Card.Jack || card == Card.Queen || card == Card.King)
+                if (card == Card.Ace)
                 {
-                    value += 10;
+                    value += 1;
                     //if the card is a face card, add 10 to the value
                     continue;
                 }
-                value += (int)card;
+
+                value += card.GetValue();
                 //if the card is not a face card, add the value of the card to the value
                 //the value of ace is 1 for now.
             }

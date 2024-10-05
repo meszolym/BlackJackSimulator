@@ -40,13 +40,13 @@ namespace BlackJackSimulator
             Strategy strategy = null;
 
             DirectoryPath.FromString(dir)
-                .MapLeft(ex => new StrategyCreationError(null, ex))
+                .MapLeft(ex => new StrategyError(null, ex))
                 .Bind(Strategy.FromDirectory)
                 .Match(
                     Right: s => strategy = s,
                     Left: e =>
                     {
-                        Console.WriteLine("Error loading strategy: " + e.Message);
+                        Console.WriteLine("Error loading strategy: " + e.InnerException.Message);
                         Environment.Exit(1);
                     });
 
