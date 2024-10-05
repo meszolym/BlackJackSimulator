@@ -6,6 +6,7 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using BlackJackSimulator.Models;
 
 namespace BlackJackSimulator
 {

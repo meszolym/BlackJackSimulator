@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using BlackJackSimulator.Models;
+using System.Diagnostics;
+using System.Threading.Channels;
 
 namespace BlackJackSimulator
 {
@@ -12,9 +14,6 @@ namespace BlackJackSimulator
             int numTasks;
             int numGames;
             int numPlayers;
-            string hardPath = "hard.csv";
-            string softPath = "soft.csv";
-            string pairPath = "pair.csv";
 
             string dir = "";
 
@@ -24,9 +23,6 @@ namespace BlackJackSimulator
                 numGames = int.Parse(args[1]);
                 numPlayers = int.Parse(args[2]);
                 dir = args[3];
-                hardPath = Path.Combine(dir, hardPath);
-                softPath = Path.Combine(dir, softPath);
-                pairPath = Path.Combine(dir, pairPath);
             }
             else
             {
@@ -38,138 +34,17 @@ namespace BlackJackSimulator
                 numPlayers = int.Parse(Console.ReadLine());
                 Console.Write("Enter the path to the directory containing the strategy csv-s: ");
                 dir = Console.ReadLine();
-                hardPath = Path.Combine(dir, hardPath);
-                softPath = Path.Combine(dir, softPath);
-                pairPath = Path.Combine(dir, pairPath);
             }
 
+            
 
+            var dirPath = DirectoryPath.FromString(dir);
 
-            #region strategy
+            dirPath.IfLeft(x => {
+                Console.WriteLine(x.Message);
+                return; });
 
-            //forrás: https://www.blackjackinfo.com/blackjack-basic-strategy-engine/?numdecks=6&soft17=s17&dbl=all&das=yes&surr=ns&peek=no
-
-            StreamReader sr = new StreamReader(hardPath);
-            string[] lines = sr.ReadToEnd().Split("\r\n");
-            sr.Close();
-
-            Strategy Strategy = new Strategy();
-
-            string val = "";
-            Action? act = null;
-            for (int i = 1; i < 19; i++)
-            {
-                for (int j = 1; j < 11; j++)
-                {
-                    val = lines[i].Split(",")[j];
-                    switch (val)
-                    {
-                        case "H":
-                            act = Action.Hit;
-                            break;
-                        case "S":
-                            act = Action.Stand;
-                            break;
-                        case "D":
-                            act = Action.DoubleHit;
-                            break;
-                        case "DS":
-                            act = Action.DoubleStand;
-                            break;
-                        case "P":
-                            act = Action.Split;
-                            break;
-                        default:
-                            throw new Exception("Should never get here");
-                    }
-
-
-                    Strategy.StrategySteps.Add(new ActionKey()
-                    {
-                        PlayerHandValue = lines[i].Split(",")[0],
-                        DealerUpCardValue = lines[0].Split(",")[j]
-                    }, act.Value);
-                }
-            }
-
-            sr = new StreamReader(softPath);
-            lines = sr.ReadToEnd().Split("\r\n");
-            sr.Close();
-            for (int i = 1; i < 9; i++)
-            {
-                for (int j = 1; j < 11; j++)
-                {
-                    val = lines[i].Split(",")[j];
-                    switch (val)
-                    {
-                        case "H":
-                            act = Action.Hit;
-                            break;
-                        case "S":
-                            act = Action.Stand;
-                            break;
-                        case "D":
-                            act = Action.DoubleHit;
-                            break;
-                        case "DS":
-                            act = Action.DoubleStand;
-                            break;
-                        case "P":
-                            act = Action.Split;
-                            break;
-                        default:
-                            throw new Exception("Should never get here");
-                    }
-
-
-                    Strategy.StrategySteps.Add(new ActionKey()
-                    {
-                        PlayerHandValue = lines[i].Split(",")[0],
-                        DealerUpCardValue = lines[0].Split(",")[j]
-                    }, act.Value);
-                }
-            }
-
-            sr = new StreamReader(pairPath);
-            lines = sr.ReadToEnd().Split("\r\n");
-            sr.Close();
-            for (int i = 1; i < 11; i++)
-            {
-                for (int j = 1; j < 11; j++)
-                {
-                    val = lines[i].Split(",")[j];
-                    switch (val)
-                    {
-                        case "H":
-                            act = Action.Hit;
-                            break;
-                        case "S":
-                            act = Action.Stand;
-                            break;
-                        case "D":
-                            act = Action.DoubleHit;
-                            break;
-                        case "DS":
-                            act = Action.DoubleStand;
-                            break;
-                        case "P":
-                            act = Action.Split;
-                            break;
-                        default:
-                            throw new Exception("Should never get here");
-                    }
-
-
-                    Strategy.StrategySteps.Add(new ActionKey()
-                    {
-                        PlayerHandValue = lines[i].Split(",")[0],
-                        DealerUpCardValue = lines[0].Split(",")[j]
-                    }, act.Value);
-                }
-            }
-
-            #endregion
-
+            Strategy strat = Strategy.FromDirectory((DirectoryPath) dirPath);
 
             double score = 0;
             object lockObj = new object();
@@ -183,7 +58,7 @@ namespace BlackJackSimulator
             {
                 tasks.Add(new Task(() =>
                 {
-                    Game g = new Game(numPlayers, Game.DefaultNumberOfDecks, Strategy, rand);
+                    Game g = new Game(numPlayers, Game.DefaultNumberOfDecks, strat, rand);
 
                     for (int j = 0; j < numGames; j++)
                     {
