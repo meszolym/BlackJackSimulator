@@ -40,13 +40,11 @@ namespace BlackJackSimulator
                 {
                     value += 10;
                     //if the card is a face card, add 10 to the value
+                    continue;
                 }
-                else
-                {
-                    value += (int)card;
-                    //if the card is not a face card, add the value of the card to the value
-                    //the value of ace is 1 for now.
-                }
+                value += (int)card;
+                //if the card is not a face card, add the value of the card to the value
+                //the value of ace is 1 for now.
             }
 
             //if the hand has an ace and can be counted as 11 without busting, it's soft and the value is increased by 10

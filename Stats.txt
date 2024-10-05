@@ -34,7 +34,7 @@ Total number of games: 1000000000
 Number of players: 1
 Total number of hands: 1000000000
 Total earnings overall: -11346763 units
-Earnings / hand: -0.011346763 units/hand -> -1,13%
+Earnings / hand: -0.011346763 units/hand -> -1,135%
 Runtime: 00:32:41.8126878 (32.69687813 minutes)
 
 Total tables: 10000
