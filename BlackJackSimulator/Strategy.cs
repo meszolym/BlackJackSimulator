@@ -5,33 +5,84 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BlackJackSimulator.Models;
+using LanguageExt;
+using Action = BlackJackSimulator.Models.Action;
+using static LanguageExt.Prelude;
+using System.Reflection.Metadata.Ecma335;
+using System.Reactive.Linq;
+
 
 namespace BlackJackSimulator
 {
-    enum Action
-    {
-        Hit,
-        Stand,
-        DoubleHit,
-        DoubleStand,
-        Split
-    }
 
-    internal struct ActionKey
-    {
-        internal string PlayerHandValue;
-        internal string DealerUpCardValue;
-    }
+    public record StrategyCreationError(Option<string> Message, Exception InnerException);
 
     internal class Strategy
     {
+        struct ActionKey
+        {
+            internal string PlayerHandValue;
+            internal string DealerUpCardValue;
+        }
 
+        //use FromDirectory
         private Strategy(Dictionary<ActionKey, Action> stratDict) => StrategySteps = stratDict.ToImmutableDictionary();
 
-        internal ImmutableDictionary<ActionKey, Action> StrategySteps;
+        ImmutableDictionary<ActionKey, Action> StrategySteps;
 
-        internal static Strategy FromDirectory(DirectoryPath directoryPath)
+        internal static Either<StrategyCreationError, Strategy> FromDirectory(DirectoryPath directoryPath)
         {
+            Dictionary<ActionKey, Action> stratDict = new();
+
+            return Try(() =>
+                   {
+                        Directory.EnumerateFiles(directoryPath.PathString, "*.csv").Iter(file =>
+                        {
+                            using (var sr = new StreamReader(file))
+                            {
+                                string[] lines = sr.ReadToEnd().Split("\r\n");
+                                string val = "";
+                                
+
+                                lines.ToObservable()
+                                     .Select((line, lineIdx) => (line.Split(','), lineIdx))
+                                     .Skip(1)
+                                     .Select((vals, colIdx) => (vals.Item1[colIdx], vals.lineIdx, colIdx))
+                                     .Subscribe(val =>
+                                     {
+                                         Action? act = null;
+                                         switch (val.Item1)
+                                         {
+                                             case "H":
+                                                 act = Action.Hit;
+                                                 break;
+                                             case "S":
+                                                 act = Action.Stand;
+                                                 break;
+                                             case "D":
+                                                 act = Action.DoubleHit;
+                                                 break;
+                                             case "DS":
+                                                 act = Action.DoubleStand;
+                                                 break;
+                                             case "P":
+                                                 act = Action.Split;
+                                                 break;
+                                             default:
+                                                 throw new Exception("Should never get here");
+                                         }
+
+                                         stratDict.Add(new ActionKey()
+                                         {
+                                             PlayerHandValue = lines[val.lineIdx].Split(",")[0],
+                                             DealerUpCardValue = lines[0].Split(",")[val.colIdx]
+                                         }, act.Value);
+                                     });
+                            }
+                        });
+                        return new Strategy(stratDict);
+                   }).ToEither(ex => new StrategyCreationError(null, ex));
+
             #region strategy
 
             //StreamReader sr = new StreamReader(hardPath);
@@ -154,9 +205,8 @@ namespace BlackJackSimulator
             //}
 
             #endregion
-
-
         }
+
 
         internal Action GetAction(Hand hand, Card dealerUpCard)
         {
@@ -167,6 +217,7 @@ namespace BlackJackSimulator
                 x => x.Key.PlayerHandValue == handval
                 && x.Key.DealerUpCardValue == dealerval).Value;
         }
+
 
     }
 }

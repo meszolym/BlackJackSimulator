@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static BlackJackSimulator.Game;
+using Action = BlackJackSimulator.Models.Action;
 
 namespace BlackJackSimulator
 {
@@ -31,7 +32,7 @@ namespace BlackJackSimulator
         internal override void PlayHands(Game game)
         {
             var possibleActions = Game.GetPossibleActions(Hands[0]);
-            Action? actionToTake = null;
+            Models.Action? actionToTake = null;
             if (possibleActions.canHit || possibleActions.canDouble || possibleActions.canSplit)
             {
                 actionToTake = Strategy.GetAction(Hands[0], game.DealerUpCard);

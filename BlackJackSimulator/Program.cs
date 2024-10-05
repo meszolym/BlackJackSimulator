@@ -36,15 +36,21 @@ namespace BlackJackSimulator
                 dir = Console.ReadLine();
             }
 
-            
 
-            var dirPath = DirectoryPath.FromString(dir);
+            Strategy strategy = null;
 
-            dirPath.IfLeft(x => {
-                Console.WriteLine(x.Message);
-                return; });
+            DirectoryPath.FromString(dir)
+                .MapLeft(ex => new StrategyCreationError(null, ex))
+                .Bind(Strategy.FromDirectory)
+                .Match(
+                    Right: s => strategy = s,
+                    Left: e =>
+                    {
+                        Console.WriteLine("Error loading strategy: " + e.Message);
+                        Environment.Exit(1);
+                    });
 
-            Strategy strat = Strategy.FromDirectory((DirectoryPath) dirPath);
+
 
             double score = 0;
             object lockObj = new object();
@@ -58,7 +64,7 @@ namespace BlackJackSimulator
             {
                 tasks.Add(new Task(() =>
                 {
-                    Game g = new Game(numPlayers, Game.DefaultNumberOfDecks, strat, rand);
+                    Game g = new Game(numPlayers, Game.DefaultNumberOfDecks, strategy, rand);
 
                     for (int j = 0; j < numGames; j++)
                     {
