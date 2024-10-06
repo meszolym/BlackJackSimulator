@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BlackJackSimulator.Models;
+using BlackJackSimulator.Models.Abstracts;
 
 namespace BlackJackSimulator
 {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BlackJackSimulator.Models;
+using BlackJackSimulator.Models.Abstracts;
 using LanguageExt;
 using static BlackJackSimulator.Game;
 using Action = BlackJackSimulator.Models.Action;
@@ -40,7 +41,7 @@ namespace BlackJackSimulator
                 actionToTake = Strategy.GetAction(HandsMutable[0].GetValue().ToString(), dealerUpCard.GetValue().ToString())
                     .Match(
                         Some: x => x,
-                        None: null
+                        None: () => throw new Exception("No action found for hand")
                     );
             }
 
@@ -76,7 +77,7 @@ namespace BlackJackSimulator
                 {
                     actionToTake = Strategy.GetAction(hand.GetValue().ToString(), dealerUpcard.GetValue().ToString()).Match(
                         Some: x => x,
-                        None: null
+                        None: () => throw new Exception("No action found for hand")
                         );
                 }
 
@@ -105,6 +106,11 @@ namespace BlackJackSimulator
                         hand.Double(shoe);
                     }
                     return;
+                }
+
+                if (actionToTake == Action.Split)
+                {
+                    throw new Exception("Should never get here");
                 }
 
             } while (hand.GetValue().Value < 21 && actionToTake != null && actionToTake != Action.Stand);
