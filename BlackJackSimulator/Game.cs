@@ -56,8 +56,8 @@ namespace BlackJackSimulator
             //play each player's hand
             foreach (var p in players)
             {
-                p.PlayHands(this);
-                foreach (var hand in p.HandsMutable.Where(h => h.State == HandState.InPlay))
+                p.PlayHands(shoe,DealerUpCard);
+                foreach (var hand in p.Hands.Where(h => h.State == HandState.InPlay))
                 {
                     if (hand.GetValue().Value > 21)
                     {
@@ -75,7 +75,7 @@ namespace BlackJackSimulator
             }
 
             //play dealer's hand
-            dealer.PlayHands(this);
+            dealer.PlayHands(shoe,DealerUpCard);
 
             //check for dealer bust
             if (dealer.Hand.GetValue().Value > 21)
@@ -83,7 +83,7 @@ namespace BlackJackSimulator
                 //dealer busts, all players still in game win
                 foreach (var player in players)
                 {
-                    foreach (var hand in player.HandsMutable.Where(h => h.State == HandState.InPlay))
+                    foreach (var hand in player.Hands.Where(h => h.State == HandState.InPlay))
                     {
                         player.Balance += hand.Bet;
                         hand.Win();
@@ -95,7 +95,7 @@ namespace BlackJackSimulator
             //compare dealer's hand to each player's hand
             foreach (var player in players)
             {
-                foreach (var hand in player.HandsMutable.Where(h => h.State == HandState.InPlay))
+                foreach (var hand in player.Hands.Where(h => h.State == HandState.InPlay))
                 {
                     var playerValue = hand.GetValue();
                     var dealerValue = dealer.Hand.GetValue();
@@ -127,7 +127,7 @@ namespace BlackJackSimulator
                 //dealer has blackjack, all players lose unless they also have blackjack
                 foreach (var player in players)
                 {
-                    foreach (var hand in player.HandsMutable.Where(h => h.State == HandState.InPlay))
+                    foreach (var hand in player.Hands.Where(h => h.State == HandState.InPlay))
                     {
                         if (!hand.GetValue().IsBlackJack)
                         {
@@ -156,9 +156,9 @@ namespace BlackJackSimulator
             {
                 foreach (var player in players)
                 {
-                    Hit(player.HandsMutable[0]);
+                    player.Hands.ElementAt(i).Hit(shoe);
                 }
-                Hit(dealer.Hand);
+                dealer.Hand.Hit(shoe);
             }
         }
     }
