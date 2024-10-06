@@ -8,7 +8,7 @@ using BlackJackSimulator.Models.Enums;
 
 namespace BlackJackSimulator.Models.Abstracts
 {
-    internal abstract class Agent
+    public abstract class Agent
     {
         public IReadOnlyCollection<Hand> Hands => HandsMutable.AsReadOnly();
         protected abstract Hand[] HandsMutable { get; set; }
