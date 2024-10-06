@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BlackJackSimulator.Models;
 using LanguageExt;
 using static BlackJackSimulator.Game;
 using Action = BlackJackSimulator.Models.Action;
@@ -36,7 +37,7 @@ namespace BlackJackSimulator
             Action? actionToTake = null;
             if (possibleActions.canHit || possibleActions.canDouble || possibleActions.canSplit)
             {
-                actionToTake = Strategy.GetAction(Hands[0], game.DealerUpCard)
+                actionToTake = Strategy.GetAction(Hands[0].GetValue().ToString(), game.DealerUpCard.GetValue().ToString())
                     .Match(
                         Some: x => x,
                         None: null
@@ -76,7 +77,7 @@ namespace BlackJackSimulator
                 possibleActions = Game.GetPossibleActions(hand);
                 if (possibleActions.canHit || possibleActions.canDouble || possibleActions.canSplit)
                 {
-                    actionToTake = Strategy.GetAction(hand, game.DealerUpCard).Match(
+                    actionToTake = Strategy.GetAction(hand.GetValue().ToString(), game.DealerUpCard.GetValue().ToString()).Match(
                         Some: x => x,
                         None: null
                         );

@@ -50,8 +50,6 @@ namespace BlackJackSimulator
                         Environment.Exit(1);
                     });
 
-
-
             double score = 0;
             object lockObj = new object();
 
