@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BlackJackSimulator.Models;
+using BlackJackSimulator.Models.Enums;
 
 namespace BlackJackSimulator.Models.Abstracts
 {

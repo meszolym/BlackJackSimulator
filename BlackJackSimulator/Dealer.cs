@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BlackJackSimulator.Models;
 using BlackJackSimulator.Models.Abstracts;
+using BlackJackSimulator.Models.Enums;
 
 namespace BlackJackSimulator
 {

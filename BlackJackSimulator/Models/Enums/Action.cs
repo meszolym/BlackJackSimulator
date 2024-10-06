@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlackJackSimulator.Models
+namespace BlackJackSimulator.Models.Enums
 {
     public enum Action
     {

@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BlackJackSimulator.Models.Enums;
 using LanguageExt;
 using LanguageExt.Common;
 using static LanguageExt.Prelude;
@@ -16,15 +17,15 @@ namespace BlackJackSimulator.Models
 
     public class Hand
     {
-        private List<Card> cardsMutable;
-        public ReadOnlyCollection<Card> Cards => cardsMutable.AsReadOnly();
+        private List<Card> _cardsMutable;
+        public ReadOnlyCollection<Card> Cards => _cardsMutable.AsReadOnly();
         public double Bet { get; private set; } //the bet placed on the hand
         public HandState State { get; private set; } //tells if the hand is in play
         public bool IsSplit { get; private set; } //tells if the hand comes from a split
 
         private Hand(List<Card> cardsMutable, double bet, HandState state, bool isSplit)
         {
-            this.cardsMutable = cardsMutable;
+            _cardsMutable = cardsMutable;
             Bet = bet;
             State = state;
             IsSplit = isSplit;
@@ -32,7 +33,7 @@ namespace BlackJackSimulator.Models
 
         public Hand()
         {
-            cardsMutable = new List<Card>();
+            _cardsMutable = new List<Card>();
             Bet = 1;
             State = HandState.InPlay;
             IsSplit = false;
@@ -44,28 +45,33 @@ namespace BlackJackSimulator.Models
                 return new HandError("Cannot double this hand!", Option<Exception>.None);
 
             Bet *= 2;
-            cardsMutable.Add(shoe.DrawCard());
+            _cardsMutable.Add(shoe.DrawCard());
             return unit;
         }
 
         public Either<HandError, Unit> Hit(Shoe shoe)
         {
-            if (!GetPossibleActions().CanHit && cardsMutable.Count != 1)
+            if (!GetPossibleActions().CanHit && _cardsMutable.Count != 1)
                 return new HandError("Cannot hit this hand!", Option<Exception>.None);
 
-            cardsMutable.Add(shoe.DrawCard());
+            _cardsMutable.Add(shoe.DrawCard());
             return unit;
         }
 
+        /// <summary>
+        /// Splits a hand into two hands, WITH 1 CARD EACH
+        /// </summary>
+        /// <returns></returns>
         public Either<HandError, Hand[]> Split() //validate
         {
             if (!GetPossibleActions().CanSplit) 
                 return new HandError("Cannot split this hand!", Option<Exception>.None);
 
-            var hands = new Hand[2];
-            var tempC = this.cardsMutable[1];
-            this.cardsMutable.RemoveAt(1);
+            var tempC = this._cardsMutable[1];
+            this._cardsMutable.RemoveAt(1);
             this.IsSplit = true;
+
+            var hands = new Hand[2];
             hands[0] = this;
             hands[1] = new Hand([tempC], this.Bet, HandState.InPlay, true);
             return hands;
@@ -79,7 +85,7 @@ namespace BlackJackSimulator.Models
 
         public void Reset()
         {
-            cardsMutable.Clear();
+            _cardsMutable.Clear();
             Bet = 1;
             State = HandState.InPlay;
             IsSplit = false;

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LanguageExt;
-using Action = BlackJackSimulator.Models.Action;
+using Action = BlackJackSimulator.Models.Enums.Action;
 using static LanguageExt.Prelude;
 using System.Reflection.Metadata.Ecma335;
 using System.Reactive.Linq;
