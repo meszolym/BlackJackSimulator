@@ -9,13 +9,11 @@ using Action = BlackJackSimulator.Models.Enums.Action;
 using static LanguageExt.Prelude;
 using System.Reflection.Metadata.Ecma335;
 using System.Reactive.Linq;
+using BlackJackSimulator.Models.Errors;
 
 
 namespace BlackJackSimulator.Models
 {
-
-    public record StrategyError(Option<string> Message, Option<Exception> InnerException);
-
     public class Strategy
     {
         record struct ActionKey

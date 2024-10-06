@@ -6,15 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BlackJackSimulator.Models.Enums;
+using BlackJackSimulator.Models.Errors;
 using LanguageExt;
 using LanguageExt.Common;
 using static LanguageExt.Prelude;
 
 namespace BlackJackSimulator.Models
 {
-
-    public record HandError(Option<string> Message, Option<Exception> InnerException);
-
     public class Hand
     {
         private List<Card> _cardsMutable;
