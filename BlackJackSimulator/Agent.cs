@@ -3,21 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BlackJackSimulator.Models;
 
 namespace BlackJackSimulator
 {
     internal abstract class Agent
     {
-        internal abstract Hand[] Hands { get; set; }
-        internal abstract void PlayHands(Game game);
-        internal virtual void ClearHand()
+        public IReadOnlyCollection<Hand> Hands
         {
-            foreach (var hand in Hands)
+            get
             {
-                hand.Cards.Clear();
-                hand.InPlay= true;
-                hand.Bet = 1;
-                hand.IsSplit = false;
+                return HandsMutable.AsReadOnly();
+            }
+        }
+        protected abstract Hand[] HandsMutable { get; set; }
+        public abstract void PlayHands(Shoe shoe, Card dealerUpCard);
+
+        public virtual void ClearHand()
+        {
+            foreach (var hand in HandsMutable)
+            {
+                hand.Reset();
             }
         }
         

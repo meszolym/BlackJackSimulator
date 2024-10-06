@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace BlackJackSimulator.Models
 {
-    public enum Action
+    public enum HandState
     {
-        Hit,
-        Stand,
-        DoubleHit,
-        DoubleStand,
-        Split
+        InPlay,
+        Lost,
+        Won,
+        Push,
+        NotPlaying
     }
 }

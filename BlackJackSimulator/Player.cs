@@ -13,99 +13,96 @@ namespace BlackJackSimulator
     internal class Player : Agent
     {
 
-        internal override Hand[] Hands { get; set; }
-        internal double Balance;
+        protected override Hand[] HandsMutable { get; set; }
+        public double Balance;
 
         Strategy Strategy;
         public Player(Strategy strategy)
         {
-            Hands = new Hand[2];
-            Hands[0] = new Hand();
-            Hands[1] = new Hand();
+            HandsMutable = new Hand[2];
+            HandsMutable[0] = new Hand();
+            HandsMutable[1] = new Hand();
             Strategy = strategy;
         }
 
-        internal override void ClearHand()
+        public override void ClearHand()
         {
             base.ClearHand();
-            Hands[1].InPlay = false; //split hand not in play yet
+            HandsMutable[1].RemoveFromGame(); //split hand not in play yet
         }
 
-        internal override void PlayHands(Game game)
+        public override void PlayHands(Shoe shoe, Card dealerUpCard)
         {
-            var possibleActions = Game.GetPossibleActions(Hands[0]);
+            var possibleActions = HandsMutable[0].GetPossibleActions();
             Action? actionToTake = null;
-            if (possibleActions.canHit || possibleActions.canDouble || possibleActions.canSplit)
+            if (possibleActions.CanHit || possibleActions.CanDouble || possibleActions.CanSplit)
             {
-                actionToTake = Strategy.GetAction(Hands[0].GetValue().ToString(), game.DealerUpCard.GetValue().ToString())
+                actionToTake = Strategy.GetAction(HandsMutable[0].GetValue().ToString(), dealerUpCard.GetValue().ToString())
                     .Match(
                         Some: x => x,
                         None: null
                     );
             }
 
-            if (actionToTake == Action.Split && possibleActions.canSplit)
+            if (actionToTake == Action.Split && possibleActions.CanSplit)
             {
                 //split the hand into two
-                var Card = Hands[0].Cards[1];
-                Hands[0].Cards.RemoveAt(1);
-                Hands[1].Cards.Add(Card);
-                Hands[1].InPlay = true;
+                HandsMutable = HandsMutable[0].Split().Match(
+                    Left: x => throw new Exception("Error splitting hand"), //!!
+                    Right: x => x
+                );
 
-                Hands[0].IsSplit = true;
-                Hands[1].IsSplit = true;
-
-                game.Hit(Hands[0]);
+                HandsMutable[0].Hit(shoe);
                 //play hand1
-                PlayOneHand(Hands[0], game);
+                PlayOneHand(HandsMutable[0], shoe, dealerUpCard);
 
 
-                game.Hit(Hands[1]);
+                HandsMutable[1].Hit(shoe);
                 //play hand2
-                PlayOneHand(Hands[1], game);
+                PlayOneHand(HandsMutable[1], shoe, dealerUpCard);
                 return;
             }
-            PlayOneHand(Hands[0], game);
+            PlayOneHand(HandsMutable[0], shoe, dealerUpCard);
         }
 
-        internal void PlayOneHand(Hand hand, Game game)
+        internal void PlayOneHand(Hand hand, Shoe shoe, Card dealerUpcard)
         {
             PossibleActions possibleActions;
             Action? actionToTake = null;
             do
             {
-                possibleActions = Game.GetPossibleActions(hand);
-                if (possibleActions.canHit || possibleActions.canDouble || possibleActions.canSplit)
+                possibleActions = hand.GetPossibleActions();
+                if (possibleActions.CanHit || possibleActions.CanDouble || possibleActions.CanSplit)
                 {
-                    actionToTake = Strategy.GetAction(hand.GetValue().ToString(), game.DealerUpCard.GetValue().ToString()).Match(
+                    actionToTake = Strategy.GetAction(hand.GetValue().ToString(), dealerUpcard.GetValue().ToString()).Match(
                         Some: x => x,
                         None: null
                         );
                 }
 
-                if (actionToTake == Action.Hit && possibleActions.canHit)
+                if (actionToTake == Action.Hit && possibleActions.CanHit)
                 {
-                    game.Hit(hand);
+                    hand.Hit(shoe);
                     continue;
                 }
 
                 if (actionToTake == Action.DoubleHit)
                 {
-                    game.Hit(hand);
-                    if (possibleActions.canDouble)
+                    if (possibleActions.CanDouble)
                     {
-                        hand.Bet *= 2;
+                        hand.Double(shoe);
                         return;
                     }
+
+                    hand.Hit(shoe);
                     continue;
                 }
 
                 if (actionToTake == Action.DoubleStand)
                 {
-                    if (possibleActions.canDouble)
+                    if (possibleActions.CanDouble)
                     {
-                        game.Hit(hand);
-                        hand.Bet *= 2;
+                        hand.Double(shoe);
                     }
                     return;
                 }

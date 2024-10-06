@@ -24,7 +24,7 @@ namespace BlackJackSimulator.Models
     }
 
 
-    internal static class CardExtensions
+    public static class CardExtensions
     {
         public static int GetValue(this Card card) => card switch
         {

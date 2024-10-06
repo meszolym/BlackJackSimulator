@@ -3,25 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BlackJackSimulator.Models;
 
 namespace BlackJackSimulator
 {
     internal class Dealer : Agent
     {
 
-        internal override Hand[] Hands { get; set; }
-        internal Hand Hand { get { return Hands[0]; } }
+        protected override Hand[] HandsMutable { get; set; }
+        internal Hand Hand { get { return HandsMutable[0]; } }
         public Dealer()
         {
-            Hands = new Hand[1];
-            Hands[0] = new Hand();
+            HandsMutable = new Hand[1];
+            HandsMutable[0] = new Hand();
         }
 
-        internal override void PlayHands(Game game)
+        public override void PlayHands(Shoe shoe, Card dealerUpCard)
         {
             while (Hand.GetValue().Value < 17)
             {
-                game.Hit(Hand);
+                Hand.Hit(shoe);
             }
         }
     }

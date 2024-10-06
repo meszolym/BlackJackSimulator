@@ -8,14 +8,14 @@ using BlackJackSimulator.Models;
 
 namespace BlackJackSimulator
 {
-    internal class HandValue
+    public class HandValue
     {
-        internal readonly int Value;
-        internal readonly bool IsSoft;
-        internal bool IsBlackJack;
-        internal bool IsPair;
+        public readonly int Value;
+        public readonly bool IsSoft;
+        public bool IsBlackJack;
+        public bool IsPair;
 
-        internal HandValue(int value, bool isSoft, bool isBlackJack, bool isPair)
+        public HandValue(int value, bool isSoft, bool isBlackJack, bool isPair)
         {
             Value = value;
             IsSoft = isSoft;
@@ -28,7 +28,7 @@ namespace BlackJackSimulator
         /// </summary>
         /// <param name="hand"></param>
         /// <returns></returns>
-        internal static HandValue GetValue(Hand hand)
+        public static HandValue GetValue(Hand hand)
         {
             int value = 0;
             bool isSoft = false;
@@ -75,7 +75,7 @@ namespace BlackJackSimulator
         /// Gets the value of a card
         /// </summary>
         /// <param name="card"></param>
-        internal static int GetValue(Card card)
+        public static int GetValue(Card card)
         {
             if (card == Card.Jack || card == Card.Queen || card == Card.King)
             {

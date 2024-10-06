@@ -46,7 +46,9 @@ namespace BlackJackSimulator
                     Right: s => strategy = s,
                     Left: e =>
                     {
-                        Console.WriteLine("Error loading strategy: " + e.InnerException.Message);
+                        Console.WriteLine("Error loading strategy: " + e.InnerException.Match(
+                            Some: e => e.Message,
+                            None: () => ""));
                         Environment.Exit(1);
                     });
 

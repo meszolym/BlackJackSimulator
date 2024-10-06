@@ -14,7 +14,7 @@ using System.Reactive.Linq;
 namespace BlackJackSimulator.Models
 {
 
-    public record StrategyError(Option<string> Message, Exception InnerException);
+    public record StrategyError(Option<string> Message, Option<Exception> InnerException);
 
     internal class Strategy
     {

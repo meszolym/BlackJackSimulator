@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace BlackJackSimulator.Models
 {
-    public enum Action
+    public struct PossibleActions
     {
-        Hit,
-        Stand,
-        DoubleHit,
-        DoubleStand,
-        Split
+        public bool CanHit;
+        public bool CanDouble;
+        public bool CanSplit;
     }
 }

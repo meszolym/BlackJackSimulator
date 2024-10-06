@@ -7,7 +7,7 @@ using BlackJackSimulator.Models;
 
 namespace BlackJackSimulator
 {
-    internal class Shoe
+    public class Shoe
     {
         Dictionary<Card, int> Cards = new();
 
