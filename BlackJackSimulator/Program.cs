@@ -1,6 +1,7 @@
 ﻿using BlackJackSimulator.Models;
 using System.Diagnostics;
 using System.Threading.Channels;
+using BlackJackSimulator.Models.Errors;
 
 namespace BlackJackSimulator
 {
@@ -57,44 +58,35 @@ namespace BlackJackSimulator
 
             long comp = 0;
             double pct = 0;
-            List<Task> tasks = new List<Task>();
+            
             Stopwatch sw = new Stopwatch();
             Random rand = new Random();
-            for (int i = 0; i < numTasks; i++)
+
+            var tasks = Enumerable.Range(0, numTasks).Select(_ => new Task(() =>
             {
-                tasks.Add(new Task(() =>
+                var game = new Game(numPlayers, Game.DefaultNumberOfDecks, strategy, rand);
+
+                for (int j = 0; j < numGames; j++)
                 {
-                    Game g = new Game(numPlayers, Game.DefaultNumberOfDecks, strategy, rand);
+                    game.PlayRound();
+                }
 
-                    for (int j = 0; j < numGames; j++)
-                    {
-                        g.PlayRound();
-                    }
+                double localScore = 0;
+                game.players.Iter(player => localScore += player.Balance);
 
-                    double localScore = 0;
+                lock (lockObj)
+                {
+                    comp++;
+                    score += localScore;
+                    if (comp % 5 == 0)
+                        Console.WriteLine("Performed tasks: " + comp + " out of " + numTasks + " in " + sw.Elapsed);
                     
-                    foreach (var p in g.players)
-                    {
-                        localScore += p.Balance;
-                    }
-                    lock (lockObj)
-                    {
-                        comp++;
-                        score += localScore;
-                        if (comp % 5 == 0)
-                        {
-                            Console.WriteLine("Performed tasks: " + comp + " out of " + numTasks + " in " + sw.Elapsed);
-                        }
-                    }
+                }
 
-                }));
-            }
+            }));
 
             sw.Start();
-            foreach (var task in tasks)
-            {
-                task.Start();
-            }
+            tasks.Iter(task => task.Start());
 
             try
             {
@@ -102,6 +94,7 @@ namespace BlackJackSimulator
             }
             catch
             { }
+
             sw.Stop();
             Console.WriteLine("---");
             Console.WriteLine("Strategy: " + dir);
@@ -119,13 +112,11 @@ namespace BlackJackSimulator
             if (errorCount > 0)
             {
                 Console.WriteLine("Faulted: " + errorCount);
-
                 /*Console.WriteLine("Errors:");
                 foreach (var task in tasks.Where(x => x.Exception != null))
                 {
                     Console.WriteLine(task.Exception);
                 }*/
-
             }
 
 

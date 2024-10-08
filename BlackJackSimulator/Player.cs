@@ -15,16 +15,22 @@ namespace BlackJackSimulator
     internal class Player : Agent
     {
 
-        protected override Hand[] HandsMutable { get; set; }
+        protected override Hand[] HandsMutable
+        {
+            get => _handsMutable;
+            set => _handsMutable = value;
+        }
+        private Hand[] _handsMutable;
+
         public double Balance;
 
-        Strategy Strategy;
+        private readonly Strategy _strategy;
         public Player(Strategy strategy)
         {
-            HandsMutable = new Hand[2];
-            HandsMutable[0] = new Hand();
-            HandsMutable[1] = new Hand();
-            Strategy = strategy;
+            _handsMutable = new Hand[2];
+            _handsMutable[0] = new Hand();
+            _handsMutable[1] = new Hand();
+            _strategy = strategy;
         }
 
         public override void ClearHand()
@@ -39,7 +45,7 @@ namespace BlackJackSimulator
             Action? actionToTake = null;
             if (possibleActions.CanHit || possibleActions.CanDouble || possibleActions.CanSplit)
             {
-                actionToTake = Strategy.GetAction(HandsMutable[0].GetValue().ToString(), dealerUpCard.GetValue().ToString())
+                actionToTake = _strategy.GetAction(HandsMutable[0].GetValue().ToString(), dealerUpCard.GetValue().ToString())
                     .Match(
                         Some: x => x,
                         None: () => throw new Exception("No action found for hand")
@@ -76,7 +82,7 @@ namespace BlackJackSimulator
                 possibleActions = hand.GetPossibleActions();
                 if (possibleActions.CanHit || possibleActions.CanDouble || possibleActions.CanSplit)
                 {
-                    actionToTake = Strategy.GetAction(hand.GetValue().ToString(), dealerUpcard.GetValue().ToString()).Match(
+                    actionToTake = _strategy.GetAction(hand.GetValue().ToString(), dealerUpcard.GetValue().ToString()).Match(
                         Some: x => x,
                         None: () => throw new Exception("No action found for hand")
                         );

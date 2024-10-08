@@ -16,6 +16,8 @@ namespace BlackJackSimulator.Models
             set => _hand = value[0];
         }
 
+        public Hand Hand => _hand;
+
         private Hand _hand = new();
 
         public override void PlayHands(Shoe shoe, Card dealerUpCard)

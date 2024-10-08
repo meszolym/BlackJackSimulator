@@ -15,12 +15,15 @@ namespace BlackJackSimulator
     {
         public const int DefaultNumberOfPlayers = 1;
         public const int DefaultNumberOfDecks = 6;
+        public const int ShuffleCardPlacementBase = 40;
+        public const int ShuffleCardPlacementVariance = 10;
 
         Dealer dealer;
         internal Player[] players;
         Shoe shoe;
 
-        public Game(int numberOfPlayers, int numberOfDecks, Strategy strategy, Random random)
+        public Game(int numberOfPlayers, int numberOfDecks, Strategy strategy, Random random, 
+            int shuffleCardPlacementBase = ShuffleCardPlacementBase, int shuffleCardPlacementVariance = ShuffleCardPlacementVariance)
         {
             dealer = new Dealer();
             players = new Player[numberOfPlayers];
@@ -28,7 +31,7 @@ namespace BlackJackSimulator
             {
                 players[i] = new Player(strategy);
             }
-            shoe = new Shoe(numberOfDecks, random);
+            shoe = new Shoe(numberOfDecks, random, shuffleCardPlacementBase, shuffleCardPlacementVariance);
         }
 
         internal Card DealerUpCard

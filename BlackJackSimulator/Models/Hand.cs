@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using BlackJackSimulator.Models.Enums;
@@ -43,7 +44,11 @@ namespace BlackJackSimulator.Models
                 return new HandError("Cannot double this hand!", Option<Exception>.None);
 
             Bet *= 2;
-            _cardsMutable.Add(shoe.DrawCard());
+
+            var c = shoe.DrawCard();
+            if (c.IsSome) _cardsMutable.Add((Card) c);
+            else return new HandError("No card could be drawn", Option<Exception>.None); //!!
+
             return unit;
         }
 
@@ -52,7 +57,10 @@ namespace BlackJackSimulator.Models
             if (!GetPossibleActions().CanHit && _cardsMutable.Count != 1)
                 return new HandError("Cannot hit this hand!", Option<Exception>.None);
 
-            _cardsMutable.Add(shoe.DrawCard());
+            var c = shoe.DrawCard();
+            if (c.IsSome) _cardsMutable.Add((Card)c);
+            else return new HandError("No card could be drawn", Option<Exception>.None);
+
             return unit;
         }
 
