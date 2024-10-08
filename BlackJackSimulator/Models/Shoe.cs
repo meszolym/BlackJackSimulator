@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BlackJackSimulator.Models.Enums;
+using BlackJackSimulator.Models.Errors;
 using LanguageExt;
 
 namespace BlackJackSimulator.Models
@@ -36,7 +37,7 @@ namespace BlackJackSimulator.Models
             Reset();
         }
 
-        public Option<Card> DrawCard()
+        public Either<ShoeError, Card> DrawCard()
         {
             //total number of cards in the shoe
             var num = _random.Next(1, _cardsInPlay + 1);
@@ -57,7 +58,8 @@ namespace BlackJackSimulator.Models
                 _cardsInPlay--;
                 return card;
             }
-            return Option<Card>.None;
+
+            return new ShoeError("Card could not be drawn", Option<Exception>.None);
         }
 
         public bool ShouldShuffle => _cardsInPlay <= _shuffleCard;

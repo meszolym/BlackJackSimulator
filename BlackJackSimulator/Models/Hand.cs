@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using BlackJackSimulator.Models.Enums;
@@ -45,11 +46,9 @@ namespace BlackJackSimulator.Models
 
             Bet *= 2;
 
-            var c = shoe.DrawCard();
-            if (c.IsSome) _cardsMutable.Add((Card) c);
-            else return new HandError("No card could be drawn", Option<Exception>.None); //!!
-
-            return unit;
+            return shoe.DrawCard()
+                .Map(card => addCardToHand(card, _cardsMutable))
+                .MapLeft(error => new HandError(error.Message, error.InnerException)); //!!
         }
 
         public Either<HandError, Unit> Hit(Shoe shoe)
@@ -57,12 +56,17 @@ namespace BlackJackSimulator.Models
             if (!GetPossibleActions().CanHit && _cardsMutable.Count != 1)
                 return new HandError("Cannot hit this hand!", Option<Exception>.None);
 
-            var c = shoe.DrawCard();
-            if (c.IsSome) _cardsMutable.Add((Card)c);
-            else return new HandError("No card could be drawn", Option<Exception>.None);
-
-            return unit;
+            return shoe.DrawCard()
+                .Map(card => addCardToHand(card, _cardsMutable))
+                .MapLeft(error => new HandError(error.Message, error.InnerException)); //!!
         }
+
+
+        private Func<Card, IList<Card>, Unit> addCardToHand = (card, cardList) =>
+        {
+            cardList.Add(card);
+            return unit;
+        };
 
         /// <summary>
         /// Splits a hand into two hands, WITH 1 CARD EACH
